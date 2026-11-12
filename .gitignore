@@ -1,0 +1,54 @@
+# Secret files and signing keys
+Keys/
+**/Keys/
+*.jks
+*.keystore
+*.key
+*.p12
+*.pem
+*.env
+.env.*
+!.env.example
+key.properties
+local.properties
+*.password
+*.secret
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
+android/.idea/
+android/local.properties
+
+# Android packages
+*.apk
+*.aab
+
+# Logs and temporary files
+*.log
+.DS_Store
+Thumbs.db
+# Private credentials
+*Password*
+*password*
+*KEY*
+*Key*
+*secret*
+*Secret*
+
+# Android internal reports
+android/.scratch/
+
+# Backup and generated files
+*.backup.*
+*.backup
+*.bak
+android/app/release/
+.env.example

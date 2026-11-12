@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">My Medicine – Medicene Reminder=دوائي – تذكير بمواعيد الدواء-</string>
+    <string name="title_activity_main">Dawaa</string>
+    <string name="package_name">com.dawaa.reminder</string>
+    <string name="custom_url_scheme">com.dawaa.reminder</string>
+</resources>
