@@ -386,17 +386,16 @@ class SoundEngine {
   }
 
   /**
-   * Start looping alarm for ringing screen
+   * Start looping alarm for ringing screen with audio + vibration
    */
-  public startAlarm(toneId: string, volume = 0.8) {
+  public startAlarm(toneId: string, volume = 0.8, vibrate = true) {
     this.stopAlarm();
     this.isCurrentlyRinging = true;
     this.activeToneId = toneId;
 
-    // Trigger vibration if supported
-    if ('vibrate' in navigator && typeof navigator.vibrate === 'function') {
+    if (vibrate && 'vibrate' in navigator && typeof navigator.vibrate === 'function') {
       try {
-        navigator.vibrate([400, 200, 400, 200, 800]);
+        navigator.vibrate([500, 250, 500, 250, 800]);
       } catch {
         // Ignore vibration errors
       }
@@ -409,9 +408,9 @@ class SoundEngine {
     this.currentLoopTimer = window.setInterval(() => {
       if (this.isCurrentlyRinging && this.activeToneId) {
         this.playTonePattern(this.activeToneId, volume);
-        if ('vibrate' in navigator && typeof navigator.vibrate === 'function') {
+        if (vibrate && 'vibrate' in navigator && typeof navigator.vibrate === 'function') {
           try {
-            navigator.vibrate([400, 200, 400]);
+            navigator.vibrate([500, 250, 500]);
           } catch {
             // Ignore
           }

@@ -18,18 +18,18 @@ export const Header: React.FC<HeaderProps> = ({
   const { t, language, toggleLanguage } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 w-full max-w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Zone 1: Single text element brand wordmark */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm">
-            <Pill className="w-5 h-5" />
+        <div className="flex items-center gap-2 shrink-0 min-w-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-sm shrink-0">
+            <Pill className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-lg font-extrabold tracking-tight text-slate-900 whitespace-nowrap">
+          <div className="flex flex-col min-w-0">
+            <span className="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 whitespace-nowrap">
               {t.appName}
             </span>
-            <span className="text-[10px] font-semibold text-teal-700 whitespace-nowrap">
+            <span className="hidden sm:block text-[10px] font-semibold text-teal-700 whitespace-nowrap truncate">
               {t.appSubtitle}
             </span>
           </div>
@@ -91,11 +91,11 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* Zone 3: Clock, Language Switcher, & Add Action */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Language Toggle Button */}
           <button
             onClick={toggleLanguage}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all active:scale-95 shadow-sm"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all active:scale-95 shadow-sm"
             title="Switch Language / تغيير اللغة"
           >
             <Globe className="w-3.5 h-3.5 text-teal-600" />
@@ -109,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenAddModal}
-            className="px-4 py-2 text-xs md:text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-600/25 active:scale-95 flex items-center gap-2 whitespace-nowrap shrink-0"
+            className="px-3 sm:px-4 py-2 text-xs md:text-sm font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-600/25 active:scale-95 flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>{t.addMedication}</span>

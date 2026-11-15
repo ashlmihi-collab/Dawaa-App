@@ -285,7 +285,7 @@ export const WeeklyScheduleView: React.FC<WeeklyScheduleViewProps> = ({
                                 </span>
                                 {ringtone && (
                                   <div className="text-[10px] text-slate-400 mt-0.5">
-                                    {ringtone.name}
+                                    {language === 'en' ? (ringtone.nameEn || ringtone.name) : ringtone.name}
                                   </div>
                                 )}
                               </div>

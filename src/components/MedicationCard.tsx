@@ -142,7 +142,9 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({
             ) : (
               <Play className="w-3.5 h-3.5 text-amber-600" />
             )}
-            <span className="hidden sm:inline text-[11px]">{ringtone.name}</span>
+            <span className="hidden sm:inline text-[11px]">
+              {language === 'en' ? (ringtone.nameEn || ringtone.name) : ringtone.name}
+            </span>
           </button>
 
           {/* Enable / Disable toggle */}

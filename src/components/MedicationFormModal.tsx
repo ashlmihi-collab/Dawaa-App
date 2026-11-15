@@ -420,7 +420,7 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
               <option value="default">{t.isDefaultRingtone}</option>
               {RINGTONES.map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.name}
+                  {language === 'en' ? (r.nameEn || r.name) : r.name}
                 </option>
               ))}
             </select>

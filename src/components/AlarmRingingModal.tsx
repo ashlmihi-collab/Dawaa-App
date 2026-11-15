@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Medication, TIME_SLOTS } from '../types/medication';
 import { soundEngine, RINGTONES } from '../utils/soundEngine';
 import { useLanguage } from '../utils/translations';
@@ -12,6 +12,7 @@ interface AlarmRingingModalProps {
   onSkip: () => void;
   snoozeMinutes?: number;
   volume?: number;
+  vibrationEnabled?: boolean;
 }
 
 export const AlarmRingingModal: React.FC<AlarmRingingModalProps> = ({
@@ -21,6 +22,7 @@ export const AlarmRingingModal: React.FC<AlarmRingingModalProps> = ({
   onSkip,
   snoozeMinutes = 5,
   volume = 0.85,
+  vibrationEnabled = true,
 }) => {
   const { t, language } = useLanguage();
   const slotInfo = TIME_SLOTS[medication.timeSlot] || TIME_SLOTS.custom;
@@ -30,14 +32,24 @@ export const AlarmRingingModal: React.FC<AlarmRingingModalProps> = ({
   const [voiceHeardText, setVoiceHeardText] = useState('');
   const recognitionRef = useRef<any>(null);
 
+  const stopVoice = useCallback(() => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      recognitionRef.current = null;
+    }
+    setIsVoiceListening(false);
+  }, []);
+
   useEffect(() => {
-    soundEngine.startAlarm(medication.ringtoneId || 'morning_gentle', volume);
+    soundEngine.startAlarm(medication.ringtoneId || 'morning_gentle', volume, vibrationEnabled);
 
     return () => {
       soundEngine.stopAlarm();
       stopVoice();
     };
-  }, [medication.ringtoneId, volume]);
+  }, [medication.ringtoneId, volume, vibrationEnabled, stopVoice]);
 
   const handleTake = () => {
     stopVoice();
@@ -61,16 +73,6 @@ export const AlarmRingingModal: React.FC<AlarmRingingModalProps> = ({
     stopVoice();
     soundEngine.stopAlarm();
     onSkip();
-  };
-
-  const stopVoice = () => {
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {}
-      recognitionRef.current = null;
-    }
-    setIsVoiceListening(false);
   };
 
   const toggleVoiceListening = () => {
@@ -164,7 +166,7 @@ export const AlarmRingingModal: React.FC<AlarmRingingModalProps> = ({
 
           <div className="mt-2.5 flex items-center gap-1.5 text-xs text-teal-100/90">
             <Volume2 className="w-3.5 h-3.5 animate-pulse" />
-            <span>{t.currentTone} {ringtone.name}</span>
+            <span>{t.currentTone} {language === 'en' ? (ringtone.nameEn || ringtone.name) : ringtone.name}</span>
           </div>
         </div>
 

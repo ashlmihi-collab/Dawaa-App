@@ -1,7 +1,8 @@
-
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import type { Medication } from '../types/medication';
+
+const CHANNEL_ID = 'dawaa_medication_sound_v2';
 
 export async function requestAndroidNotificationPermission(): Promise<boolean> {
   if (!Capacitor.isNativePlatform()) return false;
@@ -14,6 +15,28 @@ export async function requestAndroidNotificationPermission(): Promise<boolean> {
   return result.display === 'granted';
 }
 
+/**
+ * Creates Android Notification Channel with Importance 5 (HIGH/MAX) for audible alarms & vibration
+ */
+export async function createMedicationNotificationChannel(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+
+  try {
+    await LocalNotifications.createChannel({
+      id: CHANNEL_ID,
+      name: 'تنبيهات مواعيد الأدوية / Medication Alarms',
+      description: 'إشعارات صوتية عالية الأهمية للتذكير بمواعيد تناول الأدوية',
+      importance: 5,
+      visibility: 1,
+      vibration: true,
+      lights: true,
+      lightColor: '#0d9488',
+    });
+  } catch (err) {
+    console.error('Failed to create notification channel:', err);
+  }
+}
+
 export async function scheduleAndroidMedicationNotifications(
   medications: Medication[]
 ): Promise<void> {
@@ -21,6 +44,9 @@ export async function scheduleAndroidMedicationNotifications(
 
   const allowed = await requestAndroidNotificationPermission();
   if (!allowed) return;
+
+  // Ensure notification channel exists on Android 8.0+ (Android 10)
+  await createMedicationNotificationChannel();
 
   const existing = await LocalNotifications.getPending();
 
@@ -65,6 +91,7 @@ export async function scheduleAndroidMedicationNotifications(
         id: nextId++,
         title: 'موعد دوائك',
         body: `${medication.name} - ${medication.dosage}`,
+        channelId: CHANNEL_ID,
         schedule: {
           at: scheduledDate,
           repeats: true,
@@ -82,6 +109,5 @@ export async function scheduleAndroidMedicationNotifications(
     await LocalNotifications.schedule({ notifications });
   }
 
-  console.log('Dawaa notifications updated');
+  console.log('Dawaa notifications updated with channel:', CHANNEL_ID);
 }
-  

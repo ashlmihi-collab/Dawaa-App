@@ -271,7 +271,7 @@ export const RingtoneSelectorModal: React.FC<RingtoneSelectorModalProps> = ({
                       <div>
                         <div className="flex items-center gap-1.5">
                           <h4 className="font-bold text-slate-900 text-sm md:text-base">
-                            {tone.name}
+                            {language === 'en' ? (tone.nameEn || tone.name) : tone.name}
                           </h4>
                           {isSelected && (
                             <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-teal-600 text-white">

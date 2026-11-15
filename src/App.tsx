@@ -35,6 +35,8 @@ import { RingtoneSelectorModal } from './components/RingtoneSelectorModal';
 import { MedicationFormModal } from './components/MedicationFormModal';
 import { LowStockAlertBanner } from './components/LowStockAlertBanner';
 import { DeleteMedicationModal } from './components/DeleteMedicationModal';
+import { VoiceAssistantModal } from './components/VoiceAssistantModal';
+import { VoiceCommandResult, speakArabic } from './utils/voiceAssistant';
 
 import {
   Sun,
@@ -49,6 +51,7 @@ import {
   Search,
   SlidersHorizontal,
   Check,
+  Mic,
 } from 'lucide-react';
 
 export default function App() {
@@ -68,6 +71,7 @@ export default function App() {
   const [deletingMedication, setDeletingMedication] = useState<Medication | null>(null);
   const [deleteSuccessToast, setDeleteSuccessToast] = useState<string | null>(null);
   const [isRingtoneModalOpen, setIsRingtoneModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
 
   // Time & Snooze State
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -164,12 +168,19 @@ export default function App() {
   };
 
   const handleSaveMedication = (med: Medication) => {
+    const isEdit = Boolean(editingMedication);
     if (editingMedication) {
       setMedications((prev) => prev.map((m) => (m.id === med.id ? med : m)));
     } else {
       setMedications((prev) => [med, ...prev]);
     }
     setEditingMedication(null);
+
+    const spokenMsg = isEdit
+      ? (language === 'ar' ? `تم حفظ تعديلات دواء ${med.name} بنجاح` : `Updated medication ${med.name} successfully`)
+      : (language === 'ar' ? `تم إضافة دواء ${med.name} وتفعيل المنبه بنجاح` : `Added medication ${med.name} and set alarm successfully`);
+
+    speakArabic(spokenMsg);
   };
 
   const handleDeleteMedication = (medId: string) => {
@@ -193,7 +204,13 @@ export default function App() {
     }
 
     setDeletingMedication(null);
-    setDeleteSuccessToast(`Removed "${medName}"`);
+    const spokenMsg = language === 'ar'
+      ? `تم حذف وإلغاء منبه ${medName} بنجاح`
+      : `Deleted medication ${medName} successfully`;
+
+    setDeleteSuccessToast(spokenMsg);
+    speakArabic(spokenMsg);
+
     setTimeout(() => {
       setDeleteSuccessToast(null);
     }, 3500);
@@ -225,6 +242,14 @@ export default function App() {
       };
 
       setDoseLogs((prev) => [newLog, ...prev]);
+
+      const targetMed = medications.find((m) => m.id === medId);
+      if (targetMed) {
+        const spokenMsg = language === 'ar'
+          ? `صحة وعافية، تم تسجيل تناول ${targetMed.name} بنجاح`
+          : `Recorded dose ${targetMed.name} as taken successfully`;
+        speakArabic(spokenMsg);
+      }
 
       setMedications((prev) =>
         prev.map((m) => {
@@ -283,6 +308,22 @@ export default function App() {
         ringtoneId: settings.defaultRingtoneId,
         enabled: true,
       });
+    }
+  };
+
+  const handleExecuteVoiceCommand = (result: VoiceCommandResult) => {
+    if (result.type === 'TAKE_DOSE' && result.matchedMedication) {
+      handleToggleTaken(result.matchedMedication.id);
+    } else if (result.type === 'SNOOZE' && result.matchedMedication) {
+      handleRingingSnooze(result.snoozeMinutes || 5);
+    } else if (result.type === 'STOP_ALARM' || result.type === 'SKIP_DOSE') {
+      soundEngine.stopAlarm();
+      setRingingMedication(null);
+    } else if (result.type === 'NAVIGATE' && result.tabTarget) {
+      setActiveTab(result.tabTarget);
+    } else if (result.type === 'ADD_MED') {
+      setEditingMedication(null);
+      setIsFormModalOpen(true);
     }
   };
 
@@ -350,8 +391,9 @@ export default function App() {
 
   const currentRingtoneName = useMemo(() => {
     const r = RINGTONES.find((rt) => rt.id === settings.defaultRingtoneId);
-    return r ? r.name : RINGTONES[0].name;
-  }, [settings.defaultRingtoneId]);
+    const tone = r || RINGTONES[0];
+    return language === 'en' ? (tone.nameEn || tone.name) : tone.name;
+  }, [settings.defaultRingtoneId, language]);
 
   return (
     <div className="min-h-screen bg-slate-100/70 text-slate-800 font-sans flex flex-col antialiased">
@@ -409,8 +451,8 @@ export default function App() {
             />
 
             {/* Time slot filter buttons & search bar */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs max-w-full overflow-hidden">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none max-w-full">
                 <button
                   onClick={() => setActiveSlotFilter('all')}
                   className={`px-3.5 py-2 text-xs font-black rounded-xl whitespace-nowrap transition-all ${
@@ -472,7 +514,7 @@ export default function App() {
               </div>
 
               {/* Search Box */}
-              <div className="relative min-w-[220px]">
+              <div className="relative w-full sm:w-auto sm:min-w-[200px]">
                 <Search className="w-4 h-4 text-slate-400 absolute right-3 top-2.5" />
                 <input
                   type="text"
@@ -587,6 +629,16 @@ export default function App() {
         )}
       </main>
 
+      {/* Floating Smart Voice Command Action Button */}
+      <button
+        onClick={() => setIsVoiceModalOpen(true)}
+        className="fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-xl hover:shadow-2xl flex items-center justify-center transition-all active:scale-95 group border-2 border-white"
+        title={t.voiceAssistantTitle}
+        aria-label={t.voiceAssistantTitle}
+      >
+        <Mic className="w-6 h-6 group-hover:scale-110 transition-transform" />
+      </button>
+
       {/* Footer Info & Medical Disclaimer */}
       <footer className="mt-auto border-t border-slate-200 bg-slate-50/80 py-6 px-6 text-xs text-slate-600">
         <div className="max-w-7xl mx-auto flex flex-col gap-4">
@@ -620,6 +672,7 @@ export default function App() {
           onSkip={handleRingingSkip}
           snoozeMinutes={settings.snoozeMinutes}
           volume={settings.volume}
+          vibrationEnabled={settings.vibrationEnabled}
         />
       )}
 
@@ -630,6 +683,8 @@ export default function App() {
         selectedRingtoneId={settings.defaultRingtoneId}
         onSelectRingtone={(toneId) => {
           setSettings((prev) => ({ ...prev, defaultRingtoneId: toneId }));
+          const spokenMsg = language === 'ar' ? 'تم تعيين النغمة الافتراضية بنجاح' : 'Default ringtone set successfully';
+          speakArabic(spokenMsg);
         }}
         settings={settings}
         onUpdateSettings={(newSettings) => {
@@ -656,6 +711,20 @@ export default function App() {
         medication={deletingMedication}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeletingMedication(null)}
+      />
+
+      {/* Smart Voice Assistant Modal */}
+      <VoiceAssistantModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        voiceContext={{
+          ringingMedication,
+          todayMeds,
+          takenMedIds: takenMedIdsToday,
+          allMeds: medications,
+          nextMedication,
+        }}
+        onExecuteCommand={handleExecuteVoiceCommand}
       />
 
       {/* Toast feedback */}
