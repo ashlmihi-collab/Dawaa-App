@@ -17,15 +17,28 @@ export interface TranslationDictionary {
   addMedication: string;
   changeLanguage: string;
 
-  // Time Slots
-  slotMorning: string;
-  slotMorningDesc: string;
+  // Time Slots (9 Main Slots + Custom)
+  slotBeforeBreakfast: string;
+  slotBeforeBreakfastDesc: string;
+  slotDuringBreakfast: string;
+  slotDuringBreakfastDesc: string;
+  slotAfterBreakfast: string;
+  slotAfterBreakfastDesc: string;
+
   slotBeforeLunch: string;
   slotBeforeLunchDesc: string;
   slotDuringLunch: string;
   slotDuringLunchDesc: string;
-  slotNight: string;
-  slotNightDesc: string;
+  slotAfterLunch: string;
+  slotAfterLunchDesc: string;
+
+  slotBeforeDinner: string;
+  slotBeforeDinnerDesc: string;
+  slotDuringDinner: string;
+  slotDuringDinnerDesc: string;
+  slotAfterDinner: string;
+  slotAfterDinnerDesc: string;
+
   slotCustom: string;
   slotCustomDesc: string;
 
@@ -196,15 +209,28 @@ export const translations: Record<Language, TranslationDictionary> = {
     addMedication: 'إضافة دواء جديد',
     changeLanguage: 'English',
 
-    // Time Slots
-    slotMorning: 'الصباح',
-    slotMorningDesc: 'مع وجبة الإفطار أو عند الاستيقاظ',
+    // Time Slots (9 Main Slots)
+    slotBeforeBreakfast: 'قبل الإفطار',
+    slotBeforeBreakfastDesc: 'قبل وجبة الإفطار بنصف ساعة',
+    slotDuringBreakfast: 'أثناء الإفطار',
+    slotDuringBreakfastDesc: 'مع وجبة الإفطار أو مع اللقمة الأولى',
+    slotAfterBreakfast: 'بعد الإفطار',
+    slotAfterBreakfastDesc: 'بعد انتهاء وجبة الإفطار مباشرة',
+
     slotBeforeLunch: 'قبل الغداء',
-    slotBeforeLunchDesc: 'قبل وجبة الغداء بنصف ساعة إلى 45 دقيقة',
+    slotBeforeLunchDesc: 'قبل وجبة الغداء بنصف ساعة',
     slotDuringLunch: 'أثناء الغداء',
-    slotDuringLunchDesc: 'وسط وجبة الغداء أو مع اللقمة الأولى',
-    slotNight: 'بالليل',
-    slotNightDesc: 'في المساء أو قبل النوم مباشرة',
+    slotDuringLunchDesc: 'وسط وجبة الغداء',
+    slotAfterLunch: 'بعد الغداء',
+    slotAfterLunchDesc: 'بعد انتهاء وجبة الغداء مباشرة',
+
+    slotBeforeDinner: 'قبل العشاء',
+    slotBeforeDinnerDesc: 'قبل وجبة العشاء بنصف ساعة',
+    slotDuringDinner: 'أثناء العشاء',
+    slotDuringDinnerDesc: 'وسط وجبة العشاء',
+    slotAfterDinner: 'بعد العشاء / قبل النوم',
+    slotAfterDinnerDesc: 'بعد وجبة العشاء أو قبل النوم مباشرة',
+
     slotCustom: 'وقت مخصص',
     slotCustomDesc: 'توقيت خاص محدد حسب إرشادات الطبيب',
 
@@ -373,17 +399,30 @@ export const translations: Record<Language, TranslationDictionary> = {
     addMedication: 'Add Medication',
     changeLanguage: 'العربية',
 
-    // Time Slots
-    slotMorning: 'Morning',
-    slotMorningDesc: 'With breakfast or upon waking up',
+    // Time Slots (9 Main Slots)
+    slotBeforeBreakfast: 'Before Breakfast',
+    slotBeforeBreakfastDesc: '30 minutes before breakfast',
+    slotDuringBreakfast: 'During Breakfast',
+    slotDuringBreakfastDesc: 'With breakfast or first bite',
+    slotAfterBreakfast: 'After Breakfast',
+    slotAfterBreakfastDesc: 'Right after breakfast',
+
     slotBeforeLunch: 'Before Lunch',
-    slotBeforeLunchDesc: '30 to 45 minutes before lunch',
+    slotBeforeLunchDesc: '30 minutes before lunch',
     slotDuringLunch: 'During Lunch',
-    slotDuringLunchDesc: 'During lunch or with the first bite',
-    slotNight: 'Night',
-    slotNightDesc: 'In the evening or right before sleep',
+    slotDuringLunchDesc: 'During lunch',
+    slotAfterLunch: 'After Lunch',
+    slotAfterLunchDesc: 'Right after lunch',
+
+    slotBeforeDinner: 'Before Dinner',
+    slotBeforeDinnerDesc: '30 minutes before dinner',
+    slotDuringDinner: 'During Dinner',
+    slotDuringDinnerDesc: 'During dinner',
+    slotAfterDinner: 'After Dinner / Bedtime',
+    slotAfterDinnerDesc: 'After dinner or right before bedtime',
+
     slotCustom: 'Custom Time',
-    slotCustomDesc: 'Custom time as instructed by your doctor',
+    slotCustomDesc: 'Custom time prescribed by doctor',
 
     // Days of Week
     daySat: 'Saturday',

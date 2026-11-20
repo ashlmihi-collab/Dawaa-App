@@ -2,11 +2,24 @@
  * Medication and Alarm data types
  */
 
-export type TimeSlotType = 'morning' | 'before_lunch' | 'during_lunch' | 'night' | 'custom';
+export type TimeSlotType =
+  | 'before_breakfast'
+  | 'during_breakfast'
+  | 'after_breakfast'
+  | 'before_lunch'
+  | 'during_lunch'
+  | 'after_lunch'
+  | 'before_dinner'
+  | 'during_dinner'
+  | 'after_dinner'
+  | 'custom'
+  | 'morning' // legacy
+  | 'night';  // legacy
 
 export interface TimeSlotConfig {
   id: TimeSlotType;
   labelAr: string;
+  labelEn: string;
   defaultTime: string; // HH:mm
   descriptionAr: string;
   iconName: string;
@@ -15,50 +28,125 @@ export interface TimeSlotConfig {
 }
 
 export const TIME_SLOTS: Record<TimeSlotType, TimeSlotConfig> = {
-  morning: {
-    id: 'morning',
-    labelAr: 'الصباح',
-    defaultTime: '08:00',
-    descriptionAr: 'مع وجبة الإفطار أو عند الاستيقاظ',
+  before_breakfast: {
+    id: 'before_breakfast',
+    labelAr: 'قبل الإفطار',
+    labelEn: 'Before Breakfast',
+    defaultTime: '07:30',
+    descriptionAr: 'قبل وجبة الإفطار بنصف ساعة',
     iconName: 'Sun',
-    colorClass: 'text-amber-700',
+    colorClass: 'text-amber-600',
     badgeBg: 'bg-amber-100/80 border-amber-300 text-amber-900',
+  },
+  during_breakfast: {
+    id: 'during_breakfast',
+    labelAr: 'أثناء الإفطار',
+    labelEn: 'During Breakfast',
+    defaultTime: '08:00',
+    descriptionAr: 'مع وجبة الإفطار أو مع اللقمة الأولى',
+    iconName: 'Coffee',
+    colorClass: 'text-orange-600',
+    badgeBg: 'bg-orange-100/80 border-orange-300 text-orange-900',
+  },
+  after_breakfast: {
+    id: 'after_breakfast',
+    labelAr: 'بعد الإفطار',
+    labelEn: 'After Breakfast',
+    defaultTime: '08:30',
+    descriptionAr: 'بعد انتهاء وجبة الإفطار مباشرة',
+    iconName: 'Sunrise',
+    colorClass: 'text-yellow-600',
+    badgeBg: 'bg-yellow-100/80 border-yellow-300 text-yellow-900',
   },
   before_lunch: {
     id: 'before_lunch',
     labelAr: 'قبل الغداء',
+    labelEn: 'Before Lunch',
     defaultTime: '13:30',
-    descriptionAr: 'قبل وجبة الغداء بنصف ساعة إلى 45 دقيقة',
+    descriptionAr: 'قبل وجبة الغداء بنصف ساعة',
     iconName: 'Salad',
-    colorClass: 'text-emerald-700',
+    colorClass: 'text-emerald-600',
     badgeBg: 'bg-emerald-100/80 border-emerald-300 text-emerald-900',
   },
   during_lunch: {
     id: 'during_lunch',
     labelAr: 'أثناء الغداء',
+    labelEn: 'During Lunch',
     defaultTime: '14:15',
-    descriptionAr: 'وسط وجبة الغداء أو مع اللقمة الأولى',
+    descriptionAr: 'وسط وجبة الغداء',
     iconName: 'Utensils',
-    colorClass: 'text-teal-700',
+    colorClass: 'text-teal-600',
     badgeBg: 'bg-teal-100/80 border-teal-300 text-teal-900',
   },
-  night: {
-    id: 'night',
-    labelAr: 'بالليل',
-    defaultTime: '22:00',
-    descriptionAr: 'في المساء أو قبل النوم مباشرة',
+  after_lunch: {
+    id: 'after_lunch',
+    labelAr: 'بعد الغداء',
+    labelEn: 'After Lunch',
+    defaultTime: '14:45',
+    descriptionAr: 'بعد انتهاء وجبة الغداء',
+    iconName: 'Soup',
+    colorClass: 'text-cyan-600',
+    badgeBg: 'bg-cyan-100/80 border-cyan-300 text-cyan-900',
+  },
+  before_dinner: {
+    id: 'before_dinner',
+    labelAr: 'قبل العشاء',
+    labelEn: 'Before Dinner',
+    defaultTime: '19:30',
+    descriptionAr: 'قبل وجبة العشاء بنصف ساعة',
+    iconName: 'Sunset',
+    colorClass: 'text-blue-600',
+    badgeBg: 'bg-blue-100/80 border-blue-300 text-blue-900',
+  },
+  during_dinner: {
+    id: 'during_dinner',
+    labelAr: 'أثناء العشاء',
+    labelEn: 'During Dinner',
+    defaultTime: '20:15',
+    descriptionAr: 'وسط وجبة العشاء',
+    iconName: 'UtensilsCrossed',
+    colorClass: 'text-purple-600',
+    badgeBg: 'bg-purple-100/80 border-purple-300 text-purple-900',
+  },
+  after_dinner: {
+    id: 'after_dinner',
+    labelAr: 'بعد العشاء / قبل النوم',
+    labelEn: 'After Dinner / Bedtime',
+    defaultTime: '21:00',
+    descriptionAr: 'بعد وجبة العشاء أو قبل النوم مباشرة',
     iconName: 'Moon',
-    colorClass: 'text-indigo-700',
+    colorClass: 'text-indigo-600',
     badgeBg: 'bg-indigo-100/80 border-indigo-300 text-indigo-900',
   },
   custom: {
     id: 'custom',
     labelAr: 'وقت مخصص',
+    labelEn: 'Custom Time',
     defaultTime: '18:00',
     descriptionAr: 'توقيت خاص محدد حسب إرشادات الطبيب',
     iconName: 'Clock',
-    colorClass: 'text-purple-700',
-    badgeBg: 'bg-purple-100/80 border-purple-300 text-purple-900',
+    colorClass: 'text-slate-600',
+    badgeBg: 'bg-slate-100/80 border-slate-300 text-slate-900',
+  },
+  morning: {
+    id: 'during_breakfast',
+    labelAr: 'أثناء الإفطار',
+    labelEn: 'During Breakfast',
+    defaultTime: '08:00',
+    descriptionAr: 'مع وجبة الإفطار',
+    iconName: 'Coffee',
+    colorClass: 'text-orange-600',
+    badgeBg: 'bg-orange-100/80 border-orange-300 text-orange-900',
+  },
+  night: {
+    id: 'after_dinner',
+    labelAr: 'بعد العشاء / قبل النوم',
+    labelEn: 'After Dinner / Bedtime',
+    defaultTime: '21:00',
+    descriptionAr: 'بعد وجبة العشاء أو قبل النوم مباشرة',
+    iconName: 'Moon',
+    colorClass: 'text-indigo-600',
+    badgeBg: 'bg-indigo-100/80 border-indigo-300 text-indigo-900',
   },
 };
 

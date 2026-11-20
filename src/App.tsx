@@ -40,8 +40,13 @@ import { VoiceCommandResult, speakArabic } from './utils/voiceAssistant';
 
 import {
   Sun,
+  Sunrise,
+  Coffee,
   Salad,
   Utensils,
+  Soup,
+  Sunset,
+  UtensilsCrossed,
   Moon,
   Clock,
   Plus,
@@ -299,7 +304,7 @@ export default function App() {
         id: 'test-med',
         name: language === 'ar' ? 'منبه تجريبي للاختبار' : 'Test Alarm',
         dosage: language === 'ar' ? 'قرص واحد' : '1 Tablet',
-        timeSlot: 'morning',
+        timeSlot: 'during_breakfast',
         time: '08:00',
         days: [0, 1, 2, 3, 4, 5, 6],
         instructions: language === 'ar' ? 'تجربة المنبه الصوتي مع الاهتزاز' : 'Test sound and vibration',
@@ -373,7 +378,15 @@ export default function App() {
   const filteredTodayMeds = useMemo(() => {
     let list = todayMeds;
     if (activeSlotFilter !== 'all') {
-      list = list.filter((m) => m.timeSlot === activeSlotFilter);
+      list = list.filter((m) => {
+        if (activeSlotFilter === 'during_breakfast') {
+          return m.timeSlot === 'during_breakfast' || m.timeSlot === 'morning';
+        }
+        if (activeSlotFilter === 'after_dinner') {
+          return m.timeSlot === 'after_dinner' || m.timeSlot === 'night';
+        }
+        return m.timeSlot === activeSlotFilter;
+      });
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -394,6 +407,18 @@ export default function App() {
     const tone = r || RINGTONES[0];
     return language === 'en' ? (tone.nameEn || tone.name) : tone.name;
   }, [settings.defaultRingtoneId, language]);
+
+  const filterSlotsList: { id: string; label: string; icon: React.ReactNode }[] = [
+    { id: 'before_breakfast', label: t.slotBeforeBreakfast, icon: <Sun className="w-4 h-4 text-amber-500" /> },
+    { id: 'during_breakfast', label: t.slotDuringBreakfast, icon: <Coffee className="w-4 h-4 text-orange-500" /> },
+    { id: 'after_breakfast', label: t.slotAfterBreakfast, icon: <Sunrise className="w-4 h-4 text-yellow-500" /> },
+    { id: 'before_lunch', label: t.slotBeforeLunch, icon: <Salad className="w-4 h-4 text-emerald-500" /> },
+    { id: 'during_lunch', label: t.slotDuringLunch, icon: <Utensils className="w-4 h-4 text-teal-500" /> },
+    { id: 'after_lunch', label: t.slotAfterLunch, icon: <Soup className="w-4 h-4 text-cyan-500" /> },
+    { id: 'before_dinner', label: t.slotBeforeDinner, icon: <Sunset className="w-4 h-4 text-blue-500" /> },
+    { id: 'during_dinner', label: t.slotDuringDinner, icon: <UtensilsCrossed className="w-4 h-4 text-purple-500" /> },
+    { id: 'after_dinner', label: t.slotAfterDinner, icon: <Moon className="w-4 h-4 text-indigo-500" /> },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-100/70 text-slate-800 font-sans flex flex-col antialiased">
@@ -452,7 +477,7 @@ export default function App() {
 
             {/* Time slot filter buttons & search bar */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs max-w-full overflow-hidden">
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none max-w-full">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 sm:pb-0 scrollbar-none max-w-full">
                 <button
                   onClick={() => setActiveSlotFilter('all')}
                   className={`px-3.5 py-2 text-xs font-black rounded-xl whitespace-nowrap transition-all ${
@@ -464,57 +489,24 @@ export default function App() {
                   {t.allSlotsFilter} ({todayMeds.length})
                 </button>
 
-                <button
-                  onClick={() => setActiveSlotFilter('morning')}
-                  className={`px-3.5 py-2 text-xs font-black rounded-xl whitespace-nowrap flex items-center gap-1.5 transition-all ${
-                    activeSlotFilter === 'morning'
-                      ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                      : 'bg-amber-50/80 text-amber-800 hover:bg-amber-100 border border-amber-200/80'
-                  }`}
-                >
-                  <Sun className="w-4 h-4 text-amber-600" />
-                  <span>{t.slotMorning}</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveSlotFilter('before_lunch')}
-                  className={`px-3.5 py-2 text-xs font-black rounded-xl whitespace-nowrap flex items-center gap-1.5 transition-all ${
-                    activeSlotFilter === 'before_lunch'
-                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                      : 'bg-emerald-50/80 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/80'
-                  }`}
-                >
-                  <Salad className="w-4 h-4" />
-                  <span>{t.slotBeforeLunch}</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveSlotFilter('during_lunch')}
-                  className={`px-3.5 py-2 text-xs font-black rounded-xl whitespace-nowrap flex items-center gap-1.5 transition-all ${
-                    activeSlotFilter === 'during_lunch'
-                      ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20'
-                      : 'bg-teal-50/80 text-teal-800 hover:bg-teal-100 border border-teal-200/80'
-                  }`}
-                >
-                  <Utensils className="w-4 h-4" />
-                  <span>{t.slotDuringLunch}</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveSlotFilter('night')}
-                  className={`px-3.5 py-2 text-xs font-black rounded-xl whitespace-nowrap flex items-center gap-1.5 transition-all ${
-                    activeSlotFilter === 'night'
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                      : 'bg-indigo-50/80 text-indigo-800 hover:bg-indigo-100 border border-indigo-200/80'
-                  }`}
-                >
-                  <Moon className="w-4 h-4" />
-                  <span>{t.slotNight}</span>
-                </button>
+                {filterSlotsList.map((slotItem) => (
+                  <button
+                    key={slotItem.id}
+                    onClick={() => setActiveSlotFilter(slotItem.id)}
+                    className={`px-3 py-2 text-xs font-black rounded-xl whitespace-nowrap flex items-center gap-1.5 transition-all ${
+                      activeSlotFilter === slotItem.id
+                        ? 'bg-teal-600 text-white shadow-md shadow-teal-600/20'
+                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/80'
+                    }`}
+                  >
+                    {slotItem.icon}
+                    <span>{slotItem.label}</span>
+                  </button>
+                ))}
               </div>
 
               {/* Search Box */}
-              <div className="relative w-full sm:w-auto sm:min-w-[200px]">
+              <div className="relative w-full sm:w-auto sm:min-w-[180px]">
                 <Search className="w-4 h-4 text-slate-400 absolute right-3 top-2.5" />
                 <input
                   type="text"

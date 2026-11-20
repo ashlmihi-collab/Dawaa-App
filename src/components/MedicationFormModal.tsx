@@ -18,9 +18,14 @@ import {
   AlertCircle,
   Pill,
   Sun,
-  Moon,
-  Utensils,
+  Sunrise,
+  Coffee,
   Salad,
+  Utensils,
+  Soup,
+  Sunset,
+  UtensilsCrossed,
+  Moon,
   Clock
 } from 'lucide-react';
 
@@ -31,14 +36,6 @@ interface MedicationFormModalProps {
   initialMedication?: Medication | null;
   defaultRingtoneId?: string;
 }
-
-const COMMON_DRUG_SUGGESTIONS = [
-  'دواء 1',
-  'فيتامين',
-  'مكمل غذائي',
-  'مسكن',
-  'مضاد حيوي',
-];
 
 const COLOR_OPTIONS = [
   { id: 'teal', label: 'Teal', bg: 'bg-teal-500' },
@@ -62,7 +59,7 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
   const { t, language } = useLanguage();
   const [name, setName] = useState('');
   const [dosage, setDosage] = useState('1 Tablet');
-  const [timeSlot, setTimeSlot] = useState<TimeSlotType>('morning');
+  const [timeSlot, setTimeSlot] = useState<TimeSlotType>('during_breakfast');
   const [time, setTime] = useState('08:00');
   const [days, setDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [instructions, setInstructions] = useState('');
@@ -77,11 +74,20 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
   const [errorMsg, setErrorMsg] = useState('');
 
   const getSlotLabel = (slotKey: keyof typeof TIME_SLOTS) => {
-    if (slotKey === 'morning') return t.slotMorning;
-    if (slotKey === 'before_lunch') return t.slotBeforeLunch;
-    if (slotKey === 'during_lunch') return t.slotDuringLunch;
-    if (slotKey === 'night') return t.slotNight;
-    return t.slotCustom;
+    switch (slotKey) {
+      case 'before_breakfast': return t.slotBeforeBreakfast;
+      case 'during_breakfast': return t.slotDuringBreakfast;
+      case 'after_breakfast': return t.slotAfterBreakfast;
+      case 'before_lunch': return t.slotBeforeLunch;
+      case 'during_lunch': return t.slotDuringLunch;
+      case 'after_lunch': return t.slotAfterLunch;
+      case 'before_dinner': return t.slotBeforeDinner;
+      case 'during_dinner': return t.slotDuringDinner;
+      case 'after_dinner': return t.slotAfterDinner;
+      case 'morning': return t.slotDuringBreakfast;
+      case 'night': return t.slotAfterDinner;
+      default: return t.slotCustom;
+    }
   };
 
   const getDayShortLabel = (dayIdx: number) => {
@@ -114,8 +120,8 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
     } else {
       setName('');
       setDosage(t.formTabletUnit);
-      setTimeSlot('morning');
-      setTime(TIME_SLOTS.morning.defaultTime);
+      setTimeSlot('during_breakfast');
+      setTime(TIME_SLOTS.during_breakfast.defaultTime);
       setDays([0, 1, 2, 3, 4, 5, 6]);
       setInstructions('');
       setForm('tablet');
@@ -138,14 +144,17 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
     const slot = TIME_SLOTS[slotKey];
     if (slot) {
       setTime(slot.defaultTime);
-      if (slotKey === 'before_lunch') {
-        setInstructions(t.slotBeforeLunchDesc);
-      } else if (slotKey === 'during_lunch') {
-        setInstructions(t.slotDuringLunchDesc);
-      } else if (slotKey === 'night') {
-        setInstructions(t.slotNightDesc);
-      } else if (slotKey === 'morning') {
-        setInstructions(t.slotMorningDesc);
+      switch (slotKey) {
+        case 'before_breakfast': setInstructions(t.slotBeforeBreakfastDesc); break;
+        case 'during_breakfast': setInstructions(t.slotDuringBreakfastDesc); break;
+        case 'after_breakfast': setInstructions(t.slotAfterBreakfastDesc); break;
+        case 'before_lunch': setInstructions(t.slotBeforeLunchDesc); break;
+        case 'during_lunch': setInstructions(t.slotDuringLunchDesc); break;
+        case 'after_lunch': setInstructions(t.slotAfterLunchDesc); break;
+        case 'before_dinner': setInstructions(t.slotBeforeDinnerDesc); break;
+        case 'during_dinner': setInstructions(t.slotDuringDinnerDesc); break;
+        case 'after_dinner': setInstructions(t.slotAfterDinnerDesc); break;
+        default: break;
       }
     }
   };
@@ -213,12 +222,31 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
   };
 
   const slotIcons: Record<TimeSlotType, React.ReactNode> = {
-    morning: <Sun className="w-4 h-4 text-amber-500" />,
+    before_breakfast: <Sun className="w-4 h-4 text-amber-500" />,
+    during_breakfast: <Coffee className="w-4 h-4 text-orange-500" />,
+    after_breakfast: <Sunrise className="w-4 h-4 text-yellow-500" />,
     before_lunch: <Salad className="w-4 h-4 text-emerald-500" />,
     during_lunch: <Utensils className="w-4 h-4 text-teal-500" />,
-    night: <Moon className="w-4 h-4 text-indigo-500" />,
+    after_lunch: <Soup className="w-4 h-4 text-cyan-500" />,
+    before_dinner: <Sunset className="w-4 h-4 text-blue-500" />,
+    during_dinner: <UtensilsCrossed className="w-4 h-4 text-purple-500" />,
+    after_dinner: <Moon className="w-4 h-4 text-indigo-500" />,
     custom: <Clock className="w-4 h-4 text-slate-500" />,
+    morning: <Coffee className="w-4 h-4 text-orange-500" />,
+    night: <Moon className="w-4 h-4 text-indigo-500" />,
   };
+
+  const mainSlotsList: TimeSlotType[] = [
+    'before_breakfast',
+    'during_breakfast',
+    'after_breakfast',
+    'before_lunch',
+    'during_lunch',
+    'after_lunch',
+    'before_dinner',
+    'during_dinner',
+    'after_dinner',
+  ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-150">
@@ -303,32 +331,25 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
             </div>
           </div>
 
-          {/* Time Slot Presets */}
+          {/* 9 Main Time Slot Presets */}
           <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3">
             <label className="block text-xs font-bold text-slate-800">
-              {t.timeSlotLabel}
+              {t.timeSlotLabel} (9 {language === 'ar' ? 'مواعيد أساسية' : 'Main Times'})
             </label>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              {(['morning', 'before_lunch', 'during_lunch', 'night'] as TimeSlotType[]).map((slotKey) => {
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {mainSlotsList.map((slotKey) => {
                 const isSelected = timeSlot === slotKey;
                 const slot = TIME_SLOTS[slotKey];
-                const activeColorClasses: Record<TimeSlotType, string> = {
-                  morning: 'bg-amber-500 text-white border-amber-600 shadow-md shadow-amber-500/20',
-                  before_lunch: 'bg-emerald-600 text-white border-emerald-700 shadow-md shadow-emerald-600/20',
-                  during_lunch: 'bg-teal-600 text-white border-teal-700 shadow-md shadow-teal-600/20',
-                  night: 'bg-indigo-600 text-white border-indigo-700 shadow-md shadow-indigo-600/20',
-                  custom: 'bg-purple-600 text-white border-purple-700',
-                };
 
                 return (
                   <button
                     key={slotKey}
                     type="button"
                     onClick={() => handleTimeSlotSelect(slotKey)}
-                    className={`p-3 rounded-2xl border-2 text-center transition-all flex flex-col items-center gap-1.5 ${
+                    className={`p-2.5 rounded-2xl border-2 text-center transition-all flex flex-col items-center gap-1 ${
                       isSelected
-                        ? activeColorClasses[slotKey]
+                        ? 'bg-teal-600 text-white border-teal-700 shadow-md shadow-teal-600/20'
                         : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                     }`}
                   >
@@ -351,79 +372,60 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
                   type="time"
                   required
                   value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono font-bold rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-                  dir="ltr"
+                  onChange={(e) => {
+                    setTime(e.target.value);
+                    setTimeSlot('custom');
+                  }}
+                  className="w-full px-4 py-2 text-xs font-bold font-mono rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                 />
               </div>
+              <button
+                type="button"
+                onClick={() => handleTimeSlotSelect('custom')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
+                  timeSlot === 'custom'
+                    ? 'bg-purple-600 text-white border-purple-700'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                {t.slotCustom}
+              </button>
             </div>
           </div>
 
-          {/* Days of Week */}
+          {/* Repeat Days */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-slate-700">
+              <label className="block text-xs font-bold text-slate-700">
                 {t.repeatDaysLabel}
               </label>
               <button
                 type="button"
                 onClick={handleSelectAllDays}
-                className="text-xs text-teal-700 hover:underline font-semibold"
+                className="text-[11px] font-bold text-teal-600 hover:underline"
               >
                 {t.selectAllDays}
               </button>
             </div>
-
             <div className="grid grid-cols-7 gap-1.5">
-              {DAYS_OF_WEEK.map((d) => {
-                const isSelected = days.includes(d.index);
+              {DAYS_OF_WEEK.map((day) => {
+                const isSelected = days.includes(day.index);
                 return (
                   <button
-                    key={d.index}
+                    key={day.index}
                     type="button"
-                    onClick={() => handleDayToggle(d.index)}
-                    className={`py-2 px-1 rounded-xl text-xs font-bold transition-all text-center ${
+                    onClick={() => handleDayToggle(day.index)}
+                    className={`py-2 rounded-xl text-xs font-bold transition-all ${
                       isSelected
-                        ? 'bg-teal-600 text-white shadow-sm'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                        ? 'bg-teal-600 text-white shadow-xs'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-500'
                     }`}
                   >
-                    {getDayShortLabel(d.index)}
+                    {getDayShortLabel(day.index)}
                   </button>
                 );
               })}
             </div>
-          </div>
-
-          {/* Ringtone Selection */}
-          <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <Volume2 className="w-4 h-4 text-teal-600" />
-                <span>{t.ringtoneLabel}</span>
-              </label>
-              <button
-                type="button"
-                onClick={handlePreviewTone}
-                className="text-xs font-semibold text-teal-700 hover:text-teal-800 flex items-center gap-1"
-              >
-                {previewingTone ? <Square className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                <span>{previewingTone ? t.stopPreview : t.playPreview}</span>
-              </button>
-            </div>
-
-            <select
-              value={ringtoneId}
-              onChange={(e) => setRingtoneId(e.target.value)}
-              className="w-full px-3 py-2 text-xs md:text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-            >
-              <option value="default">{t.isDefaultRingtone}</option>
-              {RINGTONES.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {language === 'en' ? (r.nameEn || r.name) : r.name}
-                </option>
-              ))}
-            </select>
           </div>
 
           {/* Instructions */}
@@ -436,25 +438,98 @@ export const MedicationFormModal: React.FC<MedicationFormModalProps> = ({
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               placeholder={t.instructionsPlaceholder}
-              className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+              className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 bg-white"
             />
           </div>
 
-          {/* Action Buttons */}
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+          {/* Ringtone Selection */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+            <label className="block text-xs font-bold text-slate-700">
+              {t.ringtoneLabel}
+            </label>
+            <div className="flex items-center gap-2">
+              <select
+                value={ringtoneId}
+                onChange={(e) => setRingtoneId(e.target.value)}
+                className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-bold text-slate-800"
+              >
+                <option value="default">
+                  {language === 'ar' ? 'النغمة الافتراضية للتطبيق' : 'App Default Ringtone'}
+                </option>
+                {RINGTONES.map((rt) => (
+                  <option key={rt.id} value={rt.id}>
+                    {language === 'en' ? (rt.nameEn || rt.name) : rt.name}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={handlePreviewTone}
+                className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                  previewingTone
+                    ? 'bg-rose-600 text-white animate-pulse'
+                    : 'bg-amber-500 text-white hover:bg-amber-600'
+                }`}
+              >
+                {previewingTone ? <Square className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5" />}
+                <span>{previewingTone ? t.stopPreview : t.playPreview}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Stock Tracking */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+            <label className="block text-xs font-bold text-slate-800">
+              {t.stockTrackingTitle}
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                  {t.currentStockCount}
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={stockCount ?? ''}
+                  onChange={(e) => setStockCount(e.target.value === '' ? undefined : Number(e.target.value))}
+                  placeholder="30"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                  {t.stockThreshold}
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={stockAlertThreshold ?? ''}
+                  onChange={(e) => setStockAlertThreshold(e.target.value === '' ? undefined : Number(e.target.value))}
+                  placeholder="5"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-bold"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Modal Actions */}
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={() => {
                 soundEngine.stopAlarm();
                 onClose();
               }}
-              className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs md:text-sm font-semibold transition-colors"
+              className="px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
             >
               {t.cancel}
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs md:text-sm font-bold flex items-center gap-2 shadow-sm transition-all"
+              className="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-md shadow-teal-600/20 flex items-center gap-2 transition-all active:scale-95"
             >
               <Save className="w-4 h-4" />
               <span>{initialMedication ? t.saveChanges : t.saveMedication}</span>

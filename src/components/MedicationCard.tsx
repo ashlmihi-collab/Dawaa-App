@@ -55,11 +55,20 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({
   const isScheduledForToday = medication.days.includes(currentArabicDayIndex);
 
   const getSlotLabel = (slotKey: keyof typeof TIME_SLOTS) => {
-    if (slotKey === 'morning') return t.slotMorning;
-    if (slotKey === 'before_lunch') return t.slotBeforeLunch;
-    if (slotKey === 'during_lunch') return t.slotDuringLunch;
-    if (slotKey === 'night') return t.slotNight;
-    return t.slotCustom;
+    switch (slotKey) {
+      case 'before_breakfast': return t.slotBeforeBreakfast;
+      case 'during_breakfast': return t.slotDuringBreakfast;
+      case 'after_breakfast': return t.slotAfterBreakfast;
+      case 'before_lunch': return t.slotBeforeLunch;
+      case 'during_lunch': return t.slotDuringLunch;
+      case 'after_lunch': return t.slotAfterLunch;
+      case 'before_dinner': return t.slotBeforeDinner;
+      case 'during_dinner': return t.slotDuringDinner;
+      case 'after_dinner': return t.slotAfterDinner;
+      case 'morning': return t.slotDuringBreakfast; // legacy
+      case 'night': return t.slotAfterDinner;       // legacy
+      default: return t.slotCustom;
+    }
   };
 
   const handlePlayPreview = (e: React.MouseEvent) => {
