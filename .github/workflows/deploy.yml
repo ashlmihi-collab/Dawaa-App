@@ -4,7 +4,7 @@ name: Deploy Dawaa Public Website
 on:
   push:
     branches:
-      - public-site-clean
+      - clean-public-history
   workflow_dispatch:
 
 permissions:
